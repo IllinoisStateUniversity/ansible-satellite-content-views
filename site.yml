@@ -1,0 +1,22 @@
+---
+- name: Promotes a Content View to a Lifecycle Environment
+  hosts: localhost
+  gather_facts: false
+
+  vars_files:
+    - "vars/{{ (aap_environment == 'prod') | ternary('prod.yml', 'test.yml') }}"
+
+  tasks:
+    - name: Publish / Promote a Content View
+      redhat.satellite.content_view_version:
+        username: "{{ satellite_username }}"
+        password: "{{ satellite_password }}"
+        server_url: "{{ satellite_server_url }}"
+        content_view: "{{ item }}"
+        organization: ISU
+        lifecycle_environments: "{{ lifecycle_environments }}"
+        current_lifecycle_environment: "{{ current_lifecycle_environment | default(omit) }}"
+      loop:
+        - RHEL 7 Base
+        - RHEL 8 Base
+        - RHEL 9 Base
